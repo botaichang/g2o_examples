@@ -61,10 +61,13 @@ int main( int argc, char** argv )
         return 0;
     }
     cout<<"找到了"<<pts1.size()<<"组对应特征点。"<<endl;
+    //-------------------------------------------------------------------
     // 构造g2o中的图
-    // 先构造求解器
+    //-------------------------------------------------------------------
+    // 1.先构造求解器
     g2o::SparseOptimizer    optimizer;
-    // 使用Cholmod中的线性方程求解器
+    // 2.使用Cholmod中的线性方程求解器
+    //g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType>;
     g2o::BlockSolver_6_3::LinearSolverType* linearSolver = new  g2o::LinearSolverCholmod<g2o::BlockSolver_6_3::PoseMatrixType> ();
     // 6*3 的参数
     g2o::BlockSolver_6_3* block_solver = new g2o::BlockSolver_6_3( linearSolver );
@@ -185,6 +188,11 @@ int     findCorrespondingPoints( const cv::Mat& img1, const cv::Mat& img2, vecto
     Ptr<ORB> orb = cv::ORB::create();
     vector<cv::KeyPoint> kp1, kp2;
     cv::Mat desp1, desp2;
+
+
+    //-------------------------------------------------------------------
+    //1.orb detector find keypoints and descriptor
+    //-------------------------------------------------------------------
     //orb( img2, cv::Mat(), kp2, desp2 ); //old version
     //orb->detectAndCompute($`InputArray image`, $`InputArray mask`, $`std::vector<KeyPoint> &keypoints`, $`OutputArray descriptors`);
     orb->detectAndCompute(img1, cv::Mat(), kp1, desp1);
@@ -192,6 +200,9 @@ int     findCorrespondingPoints( const cv::Mat& img1, const cv::Mat& img2, vecto
     
     cout<<"分别找到了"<<kp1.size()<<"和"<<kp2.size()<<"个特征点"<<endl;
     
+    //-------------------------------------------------------------------
+    //2.descriptor matcher 
+    //-------------------------------------------------------------------
     cv::Ptr<cv::DescriptorMatcher>  matcher = cv::DescriptorMatcher::create( "BruteForce-Hamming");
     
     double knn_match_ratio=0.8;
